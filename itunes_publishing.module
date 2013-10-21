@@ -1,0 +1,48 @@
+<?php
+/**
+ * @file
+ * Code for the iTunes Publishing feature.
+ */
+
+include_once 'itunes_publishing.features.inc';
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function itunes_publishing_field_formatter_info() {
+  return array(
+    'itunes_publishing_image_url' => array(
+      'label' => t('Relative image URLs'),
+      'field types' => array('image'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function itunes_publishing_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  $image_styles = array(
+    'itunes_thumbnail',
+    'itunes_cover',
+  );
+
+  foreach ($items as $delta => $item) {
+    $items = array();
+
+    foreach ($image_styles as $image_style) {
+      $url = $output = image_style_url($image_style, $item['uri']);
+      $parsed = parse_url($url);
+      $items[] = substr($parsed['path'], 1);
+    }
+
+    $element[$delta] = array(
+      '#theme' => 'item_list',
+      '#items' => $items,
+    );
+  }
+
+  return $element;
+}
